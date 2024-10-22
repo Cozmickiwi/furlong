@@ -16,10 +16,11 @@ pub struct Fobj {
     rotation: [f64; 3],
     position: [f64; 3],
     visible: bool,
+    id: String,
 }
 
 impl Fobj {
-    pub fn parse_obj(strpath: &str, pos: [f64; 3]) -> Self {
+    pub fn parse_obj(strpath: &str, pos: [f64; 3], id: String) -> Self {
         let path = Path::new(strpath);
         let file = File::open(&path).expect("Could not open file!");
         let reader = BufReader::new(file);
@@ -56,6 +57,7 @@ impl Fobj {
             rotation: [0.0; 3],
             position: pos,
             visible: true,
+            id,
         };
     }
 }
