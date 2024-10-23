@@ -5,18 +5,18 @@ use std::{
 };
 
 #[derive(Debug)]
-struct Vertex {
-    position: [f64; 3],
-    indices: Vec<usize>,
+pub struct Vertex {
+    pub position: [f64; 3],
 }
 
 #[derive(Debug)]
 pub struct Fobj {
-    vertices: Vec<Vertex>,
-    rotation: [f64; 3],
-    position: [f64; 3],
-    visible: bool,
-    id: String,
+    pub vertices: Vec<Vertex>,
+    pub indices: Vec<Vec<usize>>,
+    pub rotation: [f64; 3],
+    pub position: [f64; 3],
+    pub visible: bool,
+    pub id: String,
 }
 
 impl Fobj {
@@ -25,7 +25,7 @@ impl Fobj {
         let file = File::open(&path).expect("Could not open file!");
         let reader = BufReader::new(file);
         let mut vertices: Vec<Vertex> = Vec::new();
-        let mut indexi = 0;
+        let mut indices = Vec::new();
         for line in reader.lines() {
             let l = line.unwrap();
             let segs: Vec<&str> = l.split_whitespace().collect();
@@ -36,24 +36,22 @@ impl Fobj {
                         segs[2].parse::<f64>().unwrap() + pos[1],
                         segs[3].parse::<f64>().unwrap() + pos[2],
                     ];
-                    vertices.push(Vertex {
-                        position,
-                        indices: Vec::new(),
-                    });
+                    vertices.push(Vertex { position });
                 }
                 "f" => {
+                    let mut ind = Vec::new();
                     for index in segs.iter().skip(1) {
-                        vertices[indexi]
-                            .indices
-                            .push(index.split("/").next().unwrap().parse().unwrap());
+                        ind.push(index.split("/").next().unwrap().parse::<usize>().unwrap());
                     }
-                    indexi += 1;
+                    ind.push(ind[0]);
+                    indices.push(ind);
                 }
                 _ => {}
             }
         }
         return Self {
             vertices,
+            indices,
             rotation: [0.0; 3],
             position: pos,
             visible: true,
